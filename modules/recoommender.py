@@ -74,6 +74,8 @@ def make_prompt(top_rgb, bottom_rgb, upper_label, lower_label, context, weather_
   "bottom": "<하의 색상 or 품목>",
   "reason": "<한 문장으로 된 판단 근거>",
   "suggestion": "<한 문장으로 된 개선안 (is_good=false일 때만)>"
+  "Top RGB": {tuple(top_rgb)},
+  "Bottom RGB": {tuple(bottom_rgb)}
 }}
 
 ※ JSON 이외의 어떤 내용도 포함하지 마세요.
