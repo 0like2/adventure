@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 import os
 import json
 import uuid
-import serial           # pyserial for Bluetooth
+import serial
 import time
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
@@ -14,11 +13,11 @@ from modules.weather_fetcher import prepare_arduino_weather_json
 load_dotenv()
 
 # ─── Configuration ──────────────────────────────────────────────────────────
-UPLOAD_FOLDER      = 'uploads'
-PDF_PATH           = 'fashion_style_guide.pdf'
+UPLOAD_FOLDER = 'uploads'
+PDF_PATH = 'fashion_style_guide.pdf'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
-BLUETOOTH_PORT     = os.getenv('BLUETOOTH_PORT', '/dev/cu.YEJIN')
-BLUETOOTH_BAUD     = int(os.getenv('BLUETOOTH_BAUD', '9600'))
+BLUETOOTH_PORT = os.getenv('BLUETOOTH_PORT', 'COM6')
+BLUETOOTH_BAUD = int(os.getenv('BLUETOOTH_BAUD', '9600'))
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -70,7 +69,7 @@ def upload_page():
             try:
                 rec = json.loads(s)
             except json.JSONDecodeError:
-                rec = { 'error': s }
+                rec = {'error': s}
 
         # 3) Run weather JSON generator
         w_out = prepare_arduino_weather_json()
@@ -84,19 +83,13 @@ def upload_page():
 
         # 4) Build payload: message or reason, color as top/bottom, weather with min/max temps
         payload = {
-            'message':    rec.get('suggestion') or rec.get('reason') or "",
-            'color':      f"{rec.get('top','')}/{rec.get('bottom','')}",
-            'weather': {
-                '날씨':     weather.get('날씨'),
-                '최저기온': weather.get('최저기온'),
-                '최고기온': weather.get('최고기온'),
-            }
+            'is_good': rec.get('is_good')
         }
 
         # 5) Send to Arduino via Bluetooth
         send_via_bluetooth(payload)
 
-        return jsonify({ 'status': 'sent', 'payload': payload })
+        return jsonify({'status': 'sent', 'payload': payload})
 
     # GET: show upload form
     return '''
